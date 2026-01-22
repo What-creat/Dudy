@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dudy App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #ffb6c1 0%, #ffc0cb 50%, #ffafbd 100%);
+            margin: 0; padding: 20px; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center; color: #333;
+        }
+        .screen { width: 100%; max-width: 400px; text-align: center; position: relative; }
+        .hidden { display: none !important; }
+        h1 { color: #ff1493; font-size: 2.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #ff1493; font-size: 1.8em; margin-bottom: 30px; }
+        p { font-size: 1.2em; margin-bottom: 20px; line-height: 1.5; }
+        button {
+            padding: 15px 30px; margin: 10px 5px; background: linear-gradient(45deg, #ff69b4, #ff1493);
+            color: white; border: none; border-radius: 30px; font-size: 18px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,105,180,0.4); transition: all 0.3s ease; min-width: 120px;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,105,180,0.6); }
+        button:active { transform: translateY(0); }
+        .back { background: rgba(255,255,255,0.8) !important; color: #ff1493 !important; font-size: 16px; margin-top: 30px; }
+        .call-btn { 
+            background: linear-gradient(45deg, #ff4757, #ff3838) !important; 
+            font-size: 22px; padding: 20px 40px !important;
+            box-shadow: 0 6px 25px rgba(255,71,87,0.5) !important;
+        }
+        .smoke-options { background: linear-gradient(45deg, #ff9ff3, #f368e0) !important; min-width: 100px; }
+
+        /* GLASS ANIMATIONS */
+        .glass-section { perspective: 1000px; animation: fadeIn 0.5s ease-in; }
+        .floating-glass {
+            width: 130px; height: 260px; margin: 40px auto; position: relative;
+            animation: glassFloat 3s ease-in-out infinite, glassGlow 2s ease-in-out infinite alternate;
+            cursor: pointer; transform-style: preserve-3d;
+        }
+        @keyframes glassFloat {
+            0%, 100% { transform: translateY(0px) rotateY(0deg); }
+            50% { transform: translateY(-18px) rotateY(12deg); }
+        }
+        @keyframes glassGlow {
+            0% { box-shadow: 0 10px 30px rgba(184,134,11,0.4); }
+            100% { box-shadow: 0 20px 50px rgba(184,134,11,0.7); }
+        }
+        .glass-body {
+            width: 90px; height: 140px; background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+            border: 3px solid rgba(255,255,255,0.5); border-radius: 50% 50% 25% 25% / 15% 15% 75% 75%;
+            position: absolute; top: 65px; left: 20px; box-shadow: inset 0 2px 12px rgba(255,255,255,0.4);
+        }
+        .whiskey-liquid {
+            width: 75px; height: 85px; background: linear-gradient(180deg, rgba(184,134,11,0.9) 0%, rgba(139,99,0,0.95) 100%);
+            border-radius: 45% 45% 20% 20% / 8% 8% 70% 70%; position: absolute; top: 72px; left: 23px;
+            animation: liquidSwirl 3.5s ease-in-out infinite;
+        }
+        .wine-liquid {
+            width: 75px; height: 85px; background: linear-gradient(180deg, rgba(147,105,184,0.9) 0%, rgba(128,92,160,0.95) 100%);
+            border-radius: 45% 45% 20% 20% / 8% 8% 70% 70%; position: absolute; top: 72px; left: 23px;
+            animation: liquidSwirl 3.5s ease-in-out infinite;
+        }
+        @keyframes liquidSwirl {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(4deg); }
+            75% { transform: rotate(-4deg); }
+        }
+        .glass-stem { width: 14px; height: 90px; background: rgba(255,255,255,0.4); border-radius: 7px; position: absolute; top: 115px; left: 56px; }
+        .glass-base { width: 55px; height: 18px; background: rgba(255,255,255,0.5); border-radius: 50%; position: absolute; top: 235px; left: 36px; }
+
+        /* LOVE BACKGROUND */
+        .love-bg {
+            background: linear-gradient(-45deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            animation: lovePulse 4s ease-in-out infinite alternate;
+            position: relative; overflow: hidden;
+        }
+        @keyframes lovePulse {
+            0% { background: linear-gradient(-45deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); }
+            100% { background: linear-gradient(-45deg, #fecfef 0%, #ff9a9e 50%, #ff9a9e 100%); }
+        }
+        .love-hearts { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .love-heart { position: absolute; font-size: 20px; color: #ff69b4; animation: loveFloat 5s infinite linear; }
+        @keyframes loveFloat {
+            0% { transform: translateY(100vh) scale(0) rotate(0deg); opacity: 1; }
+            50% { opacity: 0.9; transform: scale(1.1); }
+            100% { transform: translateY(-100px) scale(1) rotate(360deg); opacity: 0; }
+        }
+
+        /* SMOKE SECTIONS */
+        .light-section { perspective: 800px; }
+        .light-cigarette {
+            width: 120px; height: 30px; margin: 40px auto; background: linear-gradient(90deg, #8B4513, #D2691E);
+            border-radius: 20px 5px 5px 20px; position: relative; cursor: pointer;
+            animation: cigFloat 2.5s ease-in-out infinite;
+            box-shadow: 0 5px 20px rgba(139,69,19,0.4);
+        }
+        .light-hookah {
+            width: 120px; height: 30px; margin: 40px auto; background: linear-gradient(90deg, #4a5568, #2d3748);
+            border-radius: 10px; position: relative; cursor: pointer;
+            animation: cigFloat 2.5s ease-in-out infinite;
+            box-shadow: 0 5px 20px rgba(74,85,104,0.4);
+        }
+        @keyframes cigFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .light-flame { position: absolute; top: -15px; right: 10px; font-size: 30px; animation: flameDance 0.8s infinite alternate; }
+        @keyframes flameDance { 0% { transform: scale(1) rotate(-2deg); } 100% { transform: scale(1.2) rotate(2deg); } }
+
+        /* DARK HEARTS */
+        .dark-heart-section {
+            background: radial-gradient(circle at center, #1a0033 0%, #000000 70%);
+            color: #ff1493; animation: heartGlow 3s ease-in-out infinite alternate;
+        }
+        @keyframes heartGlow { 0% { filter: drop-shadow(0 0 10px #ff69b4); } 100% { filter: drop-shadow(0 0 20px #ff1493); } }
+        .dark-hearts { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .dark-heart { position: absolute; font-size: 24px; color: #ff1744; animation: darkFloat 6s infinite linear; }
+        @keyframes darkFloat {
+            0% { transform: translateY(100vh) scale(0) rotate(0deg); opacity: 1; }
+            50% { opacity: 0.8; transform: scale(1.2); }
+            100% { transform: translateY(-100px) scale(1) rotate(720deg); opacity: 0; }
+        }
+
+        /* GIFT */
+        .floating-gift {
+            width: 220px; height: 220px; margin: 30px auto; position: relative;
+            animation: float 3s ease-in-out infinite; cursor: pointer;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotateY(0deg); }
+            50% { transform: translateY(-15px) rotateY(10deg); }
+        }
+        .gift-box-simple {
+            width: 100%; height: 100%; background: linear-gradient(45deg, #ff6b9d, #c44569);
+            border: 10px solid #fff; border-radius: 20px; position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        .gift-ribbon-simple {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            width: 140px; height: 140px; border: 6px solid #ffd93d; border-radius: 50%;
+            box-shadow: 0 0 25px rgba(255,217,61,0.9);
+        }
+
+        .gold-sparkle-section {
+            background: radial-gradient(circle at center, #ffd700 0%, #ffed4e 30%, #1a1a1a 70%);
+            position: relative; overflow: hidden;
+        }
+        .gold-sparkles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .sparkle { 
+            position: absolute; width: 6px; height: 6px; background: #ffd700; 
+            border-radius: 50%; animation: sparkleFloat 4s infinite linear;
+            box-shadow: 0 0 10px #ffd700;
+        }
+        @keyframes sparkleFloat {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div id="welcome" class="screen">
+        <h1>Hello, dudy</h1>
+        <p>click below continue icon</p>
+        <button onclick="showFeatures()">🚀 Continue</button>
+    </div>
+
+    <div id="features" class="screen hidden">
+        <h2>What do you plan to do today?</h2>
+        <button onclick="showDrink()">Drink 🍻</button>
+        <button onclick="showSmoke()">Smoke 🚬</button>
+        <button onclick="callDudy()" class="call-btn">📞 Call dudy</button>
+        <button onclick="showGiftIntro()">🎁 Gifts</button>
+        <button onclick="backToWelcome()" class="back">← Back</button>
+    </div>
+
+    <!-- DRINK SECTIONS -->
+    <div id="drink" class="screen hidden">
+        <h2>What would you drink today?</h2>
+        <button onclick="showWhiskeyGlass()">🥃 Whiskey</button>
+        <button onclick="showWineGlass()">🍷 Wine</button>
+        <button onclick="backToFeatures()" class="back">← Back</button>
+    </div>
+
+    <div id="whiskeyGlass" class="screen hidden glass-section">
+        <h2>🥃 Your Whiskey Glass</h2>
+        <p>Tap the floating glass</p>
+        <div class="floating-glass" onclick="showDrinkLove()">
+            <div class="glass-body"></div>
+            <div class="whiskey-liquid"></div>
+            <div class="glass-stem"></div>
+            <div class="glass-base"></div>
+        </div>
+        <button onclick="backToDrink()" class="back">← Back</button>
+    </div>
+
+    <div id="wineGlass" class="screen hidden glass-section">
+        <h2>🍷 Your Wine Glass</h2>
+        <p>Tap the floating glass</p>
+        <div class="floating-glass" onclick="showDrinkLove()">
+            <div class="glass-body"></div>
+            <div class="wine-liquid"></div>
+            <div class="glass-stem"></div>
+            <div class="glass-base"></div>
+        </div>
+        <button onclick="backToDrink()" class="back">← Back</button>
+    </div>
+
+    <div id="drinkLove" class="screen love-bg">
+        <div class="love-hearts" id="loveHearts"></div>
+        <div style="position: relative; z-index: 10;">
+            <h2 style="color: #ff1493; font-size: 2em;">💕 Drink in Love 💕</h2>
+            <p style="font-size: 1.6em; color: #ff69b4; font-weight: bold; margin: 30px 0;">
+                If you drink, drink in love
+            </p>
+            <button id="drinkLoveBack" onclick="backToLastGlass()" class="back">← Back</button>
+        </div>
+    </div>
+
+    <!-- SMOKE SECTIONS -->
+    <div id="smoke" class="screen hidden">
+        <h2>Choose your vibe</h2>
+        <button onclick="showCigar()" class="smoke-options">🚬 Cigar</button>
+        <button onclick="showHookah()" class="smoke-options">🪵 Hookah</button>
+        <button onclick="backToFeatures()" class="back">← Back</button>
+    </div>
+
+    <div id="cigarLight" class="screen hidden light-section">
+        <h2>💡 Light your cigar</h2>
+        <div class="light-cigarette" onclick="showDarkHearts()">
+            <div class="light-flame">🔥</div>
+            <span style="position: absolute; top: 8px; left: 20px; color: white; font-weight: bold;">CIGAR</span>
+        </div>
+        <button onclick="backToSmoke()" class="back">← Back</button>
+    </div>
+
+    <div id="hookahLight" class="screen hidden light-section">
+        <h2>💡 Light your hookah</h2>
+        <div class="light-hookah" onclick="showDarkHearts()">
+            <div class="light-flame">🕯️</div>
+            <span style="position: absolute; top: 8px; left: 20px; color: white; font-weight: bold;">HOOKAH</span>
+        </div>
+        <button onclick="backToSmoke()" class="back">← Back</button>
+    </div>
+
+    <div id="darkHearts" class="screen dark-heart-section">
+        <div class="dark-hearts" id="darkHeartsContainer"></div>
+        <div style="position: relative; z-index: 10;">
+            <h2 style="font-size: 1.8em; margin-bottom: 20px;">💖 Light up your heart 💖</h2>
+            <p style="font-size: 1.4em; margin-bottom: 30px;">
+                Light up your heart with my love<br>instead of this smoke
+            </p>
+            <button onclick="backToSmokeLight()" class="back">← Back</button>
+        </div>
+    </div>
+
+    <!-- GIFT SECTIONS -->
+    <div id="giftIntro" class="screen hidden">
+        <h2>🎁 Special Gift for you</h2>
+        <p>Tap to discover your surprise!</p>
+        <div class="floating-gift" onclick="showDiamondRing()">
+            <div class="gift-box-simple">
+                <div class="gift-ribbon-simple"></div>
+            </div>
+        </div>
+        <button onclick="backToFeatures()" class="back">← Back</button>
+    </div>
+
+    <div id="diamondRing" class="screen gold-sparkle-section">
+        <div class="gold-sparkles" id="goldSparkles"></div>
+        <div class="diamond-ring-float" style="position: relative; width: 200px; height: 200px; margin: 30px auto; animation: ringFloat 4s ease-in-out infinite;">
+            <div class="ring-band" style="width: 140px; height: 10px; background: linear-gradient(90deg, #ffd700, #ffed4e); border-radius: 12px; position: absolute; top: 65px; left: 28px; box-shadow: 0 5px 20px rgba(255,215,0,0.8);"></div>
+            <div class="diamond" style="width: 90px; height: 90px; background: linear-gradient(45deg, #f0f8ff, #e6e6fa); clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 40px #fff, inset 0 0 25px rgba(255,255,255,0.9); animation: diamondSparkle 1s infinite alternate;"></div>
+        </div>
+        <p style="font-size: 1.3em; color: #ffd700; margin-top: 25px; font-weight: bold;">
+            ✨ You said buy me a diamond so I created one ✨
+        </p>
+        <button onclick="backToGiftIntro()" class="back">← Back</button>
+    </div>
+
+    <script>
+        let lastScreen = '';
+
+        function hideAll() {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.add('hidden'));
+        }
+
+        function showWelcome() { hideAll(); document.getElementById('welcome').classList.remove('hidden'); }
+        function showFeatures() { hideAll(); document.getElementById('features').classList.remove('hidden'); }
+        function showDrink() { hideAll(); document.getElementById('drink').classList.remove('hidden'); }
+        function showSmoke() { hideAll(); document.getElementById('smoke').classList.remove('hidden'); }
+        
+        // DRINK FLOW - FIXED
+        function showWhiskeyGlass() { 
+            lastScreen = 'whiskeyGlass';
+            hideAll(); 
+            document.getElementById('whiskeyGlass').classList.remove('hidden'); 
+        }
+        function showWineGlass() { 
+            lastScreen = 'wineGlass';
+            hideAll(); 
+            document.getElementById('wineGlass').classList.remove('hidden'); 
+        }
+        function showDrinkLove() { 
+            hideAll(); 
+            document.getElementById('drinkLove').classList.remove('hidden'); 
+            createLoveHearts(); 
+        }
+        function backToDrink() { showDrink(); }
+        function backToLastGlass() { 
+            if(lastScreen === 'whiskeyGlass') showWhiskeyGlass();
+            else if(lastScreen === 'wineGlass') showWineGlass();
+            else showDrink();
+        }
+        
+        // SMOKE FLOW - FIXED
+        function showCigar() { 
+            lastScreen = 'cigarLight';
+            hideAll(); 
+            document.getElementById('cigarLight').classList.remove('hidden'); 
+        }
+        function showHookah() { 
+            lastScreen = 'hookahLight';
+            hideAll(); 
+            document.getElementById('hookahLight').classList.remove('hidden'); 
+        }
+        function showDarkHearts() { 
+            hideAll(); 
+            document.getElementById('darkHearts').classList.remove('hidden'); 
+            createDarkHearts(); 
+        }
+        function backToSmoke() { showSmoke(); }
+        function backToSmokeLight() { 
+            if(lastScreen === 'cigarLight') showCigar();
+            else if(lastScreen === 'hookahLight') showHookah();
+            else showSmoke();
+        }
+        
+        // GIFT FLOW
+        function showGiftIntro() { hideAll(); document.getElementById('giftIntro').classList.remove('hidden'); }
+        function showDiamondRing() { 
+            hideAll(); 
+            document.getElementById('diamondRing').classList.remove('hidden'); 
+            createGoldSparkles(); 
+        }
+        function backToGiftIntro() { showGiftIntro(); }
+        
+        // ANIMATIONS
+        function createLoveHearts() {
+            const container = document.getElementById('loveHearts');
+            container.innerHTML = '';
+            for(let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'love-heart';
+                heart.innerHTML = ['💕','💖','💗','💝'][Math.floor(Math.random()*4)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 3 + 's';
+                heart.style.animationDuration = (Math.random() * 2 + 4) + 's';
+                container.appendChild(heart);
+            }
+        }
+        
+        function createDarkHearts() {
+            const container = document.getElementById('darkHeartsContainer');
+            container.innerHTML = '';
+            for(let i = 0; i < 25; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'dark-heart';
+                heart.innerHTML = ['💖','💕','💗','💝'][Math.floor(Math.random()*4)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 4 + 's';
+                heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                container.appendChild(heart);
+            }
+        }
+        
+        function createGoldSparkles() {
+            const container = document.getElementById('goldSparkles');
+            container.innerHTML = '';
+            for(let i = 0; i < 30; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.animationDelay = Math.random() * 3 + 's';
+                sparkle.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                container.appendChild(sparkle);
+            }
+        }
+        
+        function callDudy() { window.open('tel:+919699920529', '_self'); }
+        function backToWelcome() { showWelcome(); }
+        function backToFeatures() { showFeatures(); }
+        
+        showWelcome();
+    </script>
+</body>
+</html>
